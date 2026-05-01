@@ -1,0 +1,21 @@
+name: Update budget data
+on:
+  schedule:
+    - cron: '0 * * * *'  # каждый час
+  workflow_dispatch:       # ручной запуск
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Fetch data from Apps Script
+        run: |
+          curl -L "https://script.google.com/macros/s/AKfycbx-RjlninNkwR39bqfUabK69BjDHvdZAUTyc3CqOXoibhVPKOax5XrIguewRQz1Z7Lj/exec" -o data.json
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add data.json
+          git diff --staged --quiet || git commit -m "update budget data"
+          git push
